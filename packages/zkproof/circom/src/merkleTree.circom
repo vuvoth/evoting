@@ -75,6 +75,4 @@ template VerifierMerkleTree(n) {
 
 }
 
-component main = VerifierMerkleTree(4);
-
-
+component main = VerifierMerkleTree(2);

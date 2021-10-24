@@ -32,36 +32,7 @@ function initMerkleTree(currentId, mTree) {
 }
 
 
-function createMerkleProof(ticket, mTree) {
-    const equalHash = (h) => h.toString() == mimcsponge.multiHash(ticket).toString();
-    let blockId = mTree.findIndex(h => equalHash(h));
-
-    let order = []; 
-    let merklePath = [];
-    
-    const isRoot = (r) => r == 0;
-
-    while(!isRoot(blockId)) {
-
-        if (blockId % 2 == 0) {
-            order.push(0); 
-            merklePath.push(mTree[blockId - 1].toString());
-        } else {
-            order.push(1);  
-            merklePath.push(mTree[blockId + 1].toString());
-        }
-        blockId = Math.floor((blockId - 1) / 2);
-    }
-
-    return {
-        ticket, 
-        order, 
-        merklePath
-    }
-}
-
 module.exports = {
-    initTicketBlocks, 
-    initMerkleTree, 
-    createMerkleProof
+    initTicketBlocks,
+    initMerkleTree
 }
