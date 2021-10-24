@@ -1,6 +1,6 @@
 pragma circom 2.0.0;
 
-include "../node_modules/circomlib/circuits/mimcsponge.circom";
+include "../../../../node_modules/circomlib/circuits/mimcsponge.circom";
 
 template Hasher() {
     signal input left;
@@ -23,7 +23,6 @@ template TicketHash() {
     mimc.ins[0] <== ticket; 
     mimc.k <== 0; 
     result <== mimc.outs[0];
-
 }
 
 
@@ -33,13 +32,13 @@ template VerifierMerkleTree(n) {
     signal input merkleProof[n];
     signal input order[n];
     signal output root;
+    signal output voterCode;
 
     component ticketHash = TicketHash();
     ticketHash.ticket <== ticket;
 
 
     component hasher[n];
-    signal tmpHash;
 
     signal left1[n];
     signal right1[n];
@@ -67,8 +66,15 @@ template VerifierMerkleTree(n) {
     }
 
     root <== merkleHash[n];
+    
+    component genVoterCode = Hasher();
+    genVoterCode.left <== ticket; 
+    genVoterCode.right <== root; 
+
+    voterCode <== genVoterCode.result;
+
 }
 
-component main = VerifierMerkleTree(1);
+component main = VerifierMerkleTree(4);
 
 

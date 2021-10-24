@@ -60,11 +60,6 @@ function createMerkleProof(ticket, mTree) {
     }
 }
 
-
-mTree = initTicketBlocks(['010', '1000']);
-
-let ans = createMerkleProof('1000', mTree);
-
 module.exports = {
     initTicketBlocks, 
     initMerkleTree, 
