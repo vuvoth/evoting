@@ -1,6 +1,7 @@
 pragma solidity 0.6.11;
 
 import "./Verifier.sol";
+import "hardhat/console.sol";
 
 contract Voting is Verifier {
     event Vote(uint256 sessionId, uint256 voteCode, uint256 candidateId);
@@ -39,6 +40,9 @@ contract Voting is Verifier {
             "invalid-vote"
         );
         require(sessions[_sessionId].voteCodes[_voteCode] == false, "voted");
+
+        console.log("xx %s", sessions[_sessionId].root);
+
         require(
             Verifier.verifyProof(
                 a,

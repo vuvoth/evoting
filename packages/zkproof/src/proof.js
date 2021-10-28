@@ -49,7 +49,6 @@ function p256(n) {
 async function solidityProof() {
     await calculateWitness(secret);
     let ans = await snarkjs.groth16.prove("./circom/merkle_final.zkey", "./circom/witness.wtns");
-    
     return {
         output: ans.publicSignals,
         points: solidityZKPoints(ans.proof)
@@ -57,14 +56,8 @@ async function solidityProof() {
 }
 
 
-async function main() {
-
-    const { proof, publicSignals } = await snarkjs.groth16.fullProve(secret, "/Users/vuvoth/Github/evoting/packages/zkproof/circom/merkleTree_js/merkleTree.wasm", "./circom/merkle_final.zkey");
-    console.log(proof, publicSignals);
-}
-
-main().then(ans => console.log(ans)).catch(e => console.log(e));
 module.exports = {
     prove,
-    solidityProof
+    solidityProof,
+    solidityZKPoints
 }

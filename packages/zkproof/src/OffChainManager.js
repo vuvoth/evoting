@@ -2,6 +2,9 @@ const merkleTree = require('./merkleTree');
 const Web3Utils = require("web3-utils");
 const BN = Web3Utils.BN;
 const { mimcsponge } = require('circomlibjs')
+const { ethers } = require("ethers");
+
+const ethBN = ethers.BigNumber.from;
 
 function createVoteSession(numberVoter, seed = "this is the seed") {
     // init tickets
@@ -22,7 +25,7 @@ function createVoteSession(numberVoter, seed = "this is the seed") {
 }
 
 function createMerkleProof(ticket, mTree) {
-    const equalHash = (h) => h.toString() == mimcsponge.multiHash(ticket).toString();
+    const equalHash = (h) => h.toString() == mimcsponge.multiHash([ticket]).toString();
     let blockId = mTree.findIndex(h => equalHash(h));
 
     let order = [];
@@ -59,7 +62,27 @@ function createMerkleProof(ticket, mTree) {
     }
 }
 
+function p256(n) {
+    let nstr = n.toString(16);
+    while (nstr.length < 64) nstr = "0"+nstr;
+    nstr = ethBN(`${nstr}`);
+    return nstr;
+}
+
+function solidityZKPoints(proof) {
+    let solidityParams = [
+        [p256(proof.pi_a[0]), p256(proof.pi_a[1])],
+        [
+            [p256(proof.pi_b[0][1]), p256(proof.pi_b[0][0])],
+            [p256(proof.pi_b[1][1]), p256(proof.pi_b[1][0])]
+        ],
+        [p256(proof.pi_c[0]), p256(proof.pi_c[1])]
+    ]
+    return solidityParams;
+}
+
 module.exports = {
     createVoteSession,
-    createMerkleProof
+    createMerkleProof, 
+    solidityZKPoints
 }
