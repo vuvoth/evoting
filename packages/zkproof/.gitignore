@@ -1,0 +1,12 @@
+
+#Hardhat files
+cache
+artifacts
+.env
+
+build
+
+deployments
+
+./circom/pot15_0000.ptau
+./circom/pot15_final.ptau
