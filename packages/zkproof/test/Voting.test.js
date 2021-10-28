@@ -40,9 +40,11 @@ describe("Voting", function () {
       let { proof, publicSignals } = await snarkjs.groth16.fullProve(secretInput.data, merkleTreeWasmPath, zkeyPath);
 
       let zkPoints = OffChainManager.solidityZKPoints(proof);
-      await voting.vote(sessionId, publicSignals[1], 1, ...zkPoints);
+   
+      await voting.vote(sessionId, publicSignals[1], 0, ...zkPoints);
+
+      console.log(await voting.reportAll('0'));
     });
   })
-
 
 });

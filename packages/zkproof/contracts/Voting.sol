@@ -1,7 +1,7 @@
+// SPDX-License-Identifier: MIT
 pragma solidity 0.6.11;
 
 import "./Verifier.sol";
-import "hardhat/console.sol";
 
 contract Voting is Verifier {
     event Vote(uint256 sessionId, uint256 voteCode, uint256 candidateId);
@@ -41,8 +41,6 @@ contract Voting is Verifier {
         );
         require(sessions[_sessionId].voteCodes[_voteCode] == false, "voted");
 
-        console.log("xx %s", sessions[_sessionId].root);
-
         require(
             Verifier.verifyProof(
                 a,
@@ -63,6 +61,7 @@ contract Voting is Verifier {
         view
         returns (uint256[] memory numberVotes)
     {
+        require(sessions[_sessionId].root != 0, "Vote market not exist");
         uint256 candidateNumber = sessions[_sessionId].candidates.length;
         numberVotes = new uint256[](candidateNumber);
 
