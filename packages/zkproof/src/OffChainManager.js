@@ -16,7 +16,7 @@ function createVoteSession(numberVoter, seed = "this is the seed") {
 
     return {
         root: mTree[0].toString(),
-        mTree, 
+        mTree,
         tickets
     };
 }
@@ -30,8 +30,8 @@ function createMerkleProof(ticket, mTree) {
 
     if (blockId == -1) {
         return {
-            exist: false, 
-            ticket, 
+            exist: false,
+            ticket,
             order,
             merkleProof
         }
@@ -51,9 +51,11 @@ function createMerkleProof(ticket, mTree) {
 
     return {
         exist: true,
-        ticket,
-        order,
-        merkleProof
+        data: {
+            ticket,
+            order,
+            merkleProof
+        }
     }
 }
 

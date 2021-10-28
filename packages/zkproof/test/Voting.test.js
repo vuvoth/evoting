@@ -2,22 +2,13 @@ const { expect } = require("chai");
 const { ethers } = require("hardhat");
 const OffChainManager = require('../src/OffChainManager');
 const snarkjs = require('snarkjs');
-const {solidityProof} = require('../src/proof');
 
-const {readFileSync} = require('fs');
-
-function p256(n) {
-  let nstr = n.toString(16);
-  while (nstr.length < 64) nstr = "0"+nstr;
-  nstr = `"0x${nstr}"`;
-  return nstr;
-}
-
-// const 
 describe("Voting", function () {
   let voting;
   let mTree, tickets, root;
-  let wasm, zkey;
+
+  const zkeyPath = "./circom/merkle_final.zkey";
+  const merkleTreeWasmPath = "./circom/merkleTree.wasm";
 
   beforeEach(async () => {
     const Voting = await ethers.getContractFactory("Voting");
@@ -33,13 +24,15 @@ describe("Voting", function () {
 
   })
   describe("Voting and count", () => {
-    it("voting", async function () {
-      let secret = OffChainManager.createMerkleProof(tickets[0].toString(), mTree);
-      let ans = await solidityProof();      
-      console.log(JSON.stringify(ans, null, 2));
+    it("verify vote sucessfully", async function () {
+      const secretInput = OffChainManager.createMerkleProof(tickets[0], mTree);
+
+      expect(secretInput.exist).equal(true);
+      if (secretInput.exist) {
+        let {proof, publicSignals} = await snarkjs.groth16.fullProve(secretInput.data, merkleTreeWasmPath, zkeyPath);
+      }
     });
   })
-
 
 
 });
