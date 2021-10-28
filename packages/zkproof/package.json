@@ -8,6 +8,7 @@
   },
   "scripts": {
     "cirCompile": "cd ./circom/ && circom src/merkleTree.circom --r1cs --wasm --sym",
+    "potSetup": "snarkjs powersoftau new bn128 15 ./circom/pot15_0000.ptau -v && snarkjs powersoftau prepare phase2 ./circom/pot15_0000.ptau ./circom/pot15_final.ptau -v",
     "zkSetup": "snarkjs groth16 setup ./circom/merkleTree.r1cs ./circom/pot15_final.ptau ./circom/merkle_final.zkey",
     "zkProof": "snarkjs groth16 prove ./circom/merkle_final.zkey ./circom/merkleTree_js/witness.wtns ./circom/proof.json ./circom/public.json",
     "exportVerifyKey": "snarkjs zkey export verificationkey ./circom/merkle_final.zkey ./circom/verification_key.json",
