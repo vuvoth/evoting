@@ -13,3 +13,4 @@ circom/*.r1cs
 circom/*.sym
 circom/*.zkey
 circom/*.wasm
+circom/*.json
