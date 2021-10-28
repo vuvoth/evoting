@@ -8,8 +8,8 @@ build
 
 deployments
 
-./circom/*.ptau
-./circom/*.r1cs
-./circom/*.sym
-./circom/*.zkey
-./circom/*.wasm
+circom/*.ptau
+circom/*.r1cs
+circom/*.sym
+circom/*.zkey
+circom/*.wasm
