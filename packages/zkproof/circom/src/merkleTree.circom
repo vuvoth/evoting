@@ -1,4 +1,4 @@
-pragma circom 2.0.0;
+// pragma circom 2.0.0;
 
 include "../../../../node_modules/circomlib/circuits/mimcsponge.circom";
 
@@ -28,9 +28,9 @@ template TicketHash() {
 
 
 template VerifierMerkleTree(n) {
-    signal input ticket; 
-    signal input merkleProof[n];
-    signal input order[n];
+    signal private input ticket; 
+    signal private input merkleProof[n];
+    signal private input order[n];
     signal output root;
     signal output voterCode;
 

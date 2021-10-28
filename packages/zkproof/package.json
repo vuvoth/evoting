@@ -7,7 +7,7 @@
     "email": "vu.voth@gmail.com"
   },
   "scripts": {
-    "cirCompile": "circom ./circom/src/merkleTree.circom --r1cs --wasm --sym -o ./circom/",
+    "cirCompile": "cd ./circom/ && circom src/merkleTree.circom --r1cs --wasm --sym",
     "zkSetup": "snarkjs groth16 setup ./circom/merkleTree.r1cs ./circom/pot15_final.ptau ./circom/merkle_final.zkey",
     "zkProof": "snarkjs groth16 prove ./circom/merkle_final.zkey ./circom/merkleTree_js/witness.wtns ./circom/proof.json ./circom/public.json",
     "exportVerifyKey": "snarkjs zkey export verificationkey ./circom/merkle_final.zkey ./circom/verification_key.json",
@@ -15,10 +15,11 @@
   },
   "main": "index.js",
   "dependencies": {
-    "circomlib": "^2.0.0",
+    "circom": "^0.5.46",
+    "circomlib": "0.5.0",
     "circomlibjs": "^0.0.8",
     "core-js": "^3.6.5",
-    "snarkjs": "^0.4.10"
+    "snarkjs": "0.4.10"
   },
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.2",

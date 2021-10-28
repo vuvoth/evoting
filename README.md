@@ -51,7 +51,7 @@ node generate_witness.js multiplier2.wasm input.json witness.wtns
 Gen proof
 
 ```bash
-snarkjs groth16 prove multiplier2_final.zkey witness.wtns proof.json public.json
+snarkjs groth16 prove multiplier2_final.zkey witness.tns proof.json public.json
 ```
 # Verify the proof 
 

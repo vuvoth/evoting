@@ -2,7 +2,7 @@ const { expect } = require("chai");
 const { ethers } = require("hardhat");
 const OffChainManager = require('../src/OffChainManager');
 const snarkjs = require('snarkjs');
-const {prove} = require('../src/proof');
+const {solidityProof} = require('../src/proof');
 
 const {readFileSync} = require('fs');
 
@@ -30,15 +30,13 @@ describe("Voting", function () {
     tickets = sessionOffChain.tickets;
     root = sessionOffChain.root;
     await voting.createVoteSession(root);
-    // zkey = readFileSync('./circom/merkle_final.zkey', 'utf8');
-    // wasm = readFileSync('./circom/merkleTree_js/merkleTree.wasm', 'utf8');
 
   })
   describe("Voting and count", () => {
     it("voting", async function () {
       let secret = OffChainManager.createMerkleProof(tickets[0].toString(), mTree);
-      let ans = await prove();      
-      console.log(ans);
+      let ans = await solidityProof();      
+      console.log(JSON.stringify(ans, null, 2));
     });
   })
 

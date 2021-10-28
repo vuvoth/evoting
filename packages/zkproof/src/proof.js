@@ -7,11 +7,8 @@ async function calculateWitness(input) {
     const buffer = readFileSync("./circom/merkleTree_js/merkleTree.wasm");
 
     let witnessCalculator = await wc(buffer);
-    //    const w= await witnessCalculator.calculateWitness(input,0);
-    //    for (let i=0; i< w.length; i++){
-    //	console.log(w[i]);
-    //    }
     const buff = await witnessCalculator.calculateWTNSBin(input, 0);
+
     writeFileSync("./circom/witness.wtns", buff);
 }
 
@@ -24,13 +21,50 @@ let secret = {
     ]
 }
 
-
 async function prove() {
     await calculateWitness(secret);
     let ans = await snarkjs.groth16.prove("./circom/merkle_final.zkey", "./circom/witness.wtns");
     return ans;
 }
 
+function solidityZKPoints(proof) {
+    let solidityParams = [
+        [p256(proof.pi_a[0]), p256(proof.pi_a[1])],
+        [
+            [p256(proof.pi_b[0][1]), p256(proof.pi_b[0][0])],
+            [p256(proof.pi_b[1][1]), p256(proof.pi_b[1][0])]
+        ],
+        [p256(proof.pi_c[0]), p256(proof.pi_c[1])]
+    ]
+    return solidityParams;
+}
+
+function p256(n) {
+    let nstr = n.toString(16);
+    while (nstr.length < 64) nstr = "0"+nstr;
+    nstr = `"0x${nstr}"`;
+    return nstr;
+}
+
+async function solidityProof() {
+    await calculateWitness(secret);
+    let ans = await snarkjs.groth16.prove("./circom/merkle_final.zkey", "./circom/witness.wtns");
+    
+    return {
+        output: ans.publicSignals,
+        points: solidityZKPoints(ans.proof)
+    }
+}
+
+
+async function main() {
+
+    const { proof, publicSignals } = await snarkjs.groth16.fullProve(secret, "/Users/vuvoth/Github/evoting/packages/zkproof/circom/merkleTree_js/merkleTree.wasm", "./circom/merkle_final.zkey");
+    console.log(proof, publicSignals);
+}
+
+main().then(ans => console.log(ans)).catch(e => console.log(e));
 module.exports = {
-    prove
+    prove,
+    solidityProof
 }
