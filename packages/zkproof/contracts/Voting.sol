@@ -30,6 +30,7 @@ contract Voting is Verifier {
     function vote(
         uint256 _sessionId,
         uint256 _voteCode,
+        uint256 _candidateCode,
         uint256 _candidateId,
         uint256[2] memory a,
         uint256[2][2] memory b,
@@ -39,6 +40,7 @@ contract Voting is Verifier {
             _candidateId < sessions[_sessionId].candidates.length,
             "invalid-vote"
         );
+
         require(sessions[_sessionId].voteCodes[_voteCode] == false, "voted");
 
         require(
@@ -46,7 +48,7 @@ contract Voting is Verifier {
                 a,
                 b,
                 c,
-                [sessions[_sessionId].root, _voteCode]
+                [sessions[_sessionId].root, _voteCode, _candidateCode, _candidateId]
             ),
             "not-allowed-for-vote"
         );

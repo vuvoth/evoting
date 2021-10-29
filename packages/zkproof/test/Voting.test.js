@@ -29,7 +29,7 @@ describe("Voting", function () {
     sessionId = 0;
   })
 
-  it("Check parammeters", async() => {
+  it("Check parammeters", async () => {
     // check counter 
     let counts = await voting.reportAll(sessionId);
     for (let c of counts) {
@@ -46,11 +46,13 @@ describe("Voting", function () {
 
       expect(secretInput.exist).equal(true);
 
+      secretInput.data["candidate"] = candidate;
+
       let { proof, publicSignals } = await snarkjs.groth16.fullProve(secretInput.data, merkleTreeWasmPath, zkeyPath);
 
       let zkPoints = OffChainManager.solidityZKPoints(proof);
-   
-      await voting.vote(sessionId, publicSignals[1], candidate, ...zkPoints).should.be.fulfilled;
+
+      await voting.vote(sessionId, publicSignals[1], publicSignals[2], candidate, ...zkPoints).should.be.fulfilled;
 
       let result = await voting.reportAll(sessionId);
 
@@ -59,7 +61,7 @@ describe("Voting", function () {
       expect(await voting.isVoted(sessionId, publicSignals[1])).to.equal(true);
     });
 
-    
+
   })
 
 });

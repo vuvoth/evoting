@@ -28,12 +28,14 @@ template TicketHash() {
 
 
 template VerifierMerkleTree(n) {
+    signal input candidate;
     signal private input ticket; 
     signal private input merkleProof[n];
     signal private input order[n];
     signal output root;
     signal output voterCode;
-
+    signal output candidateCode;
+    
     component ticketHash = TicketHash();
     ticketHash.ticket <== ticket;
 
@@ -71,6 +73,11 @@ template VerifierMerkleTree(n) {
     genVoterCode.right <== root; 
 
     voterCode <== genVoterCode.result;
+
+    component genCandidateCode = Hasher(); 
+    genCandidateCode.left <== ticket;
+    genCandidateCode.right <== candidate;
+    candidateCode <== genCandidateCode.result;
 
 }
 
