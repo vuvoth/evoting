@@ -56,6 +56,14 @@ contract Voting is Verifier {
         emit Vote(_sessionId, _voteCode, _candidateId);
     }
 
+    function rootOf(uint256 _sessionId) public view returns(uint256) {
+        return sessions[_sessionId].root;
+    }
+
+    function isVoted(uint256 _sessionId, uint256 _voteCode) public view returns(bool) {
+        return sessions[_sessionId].voteCodes[_voteCode];
+    }
+
     function reportAll(uint256 _sessionId)
         public
         view

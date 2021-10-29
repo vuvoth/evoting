@@ -1,11 +1,9 @@
+require("./setup");
+
 const { expect } = require("chai");
 const { ethers } = require("hardhat");
 const OffChainManager = require('../src/OffChainManager');
 const snarkjs = require('snarkjs');
-const Web3Utils = require("web3-utils");
-const BN = Web3Utils.BN;
-
-const { mimcsponge } = require('circomlibjs');
 
 describe("Voting", function () {
   const zkeyPath = "./circom/merkle_final.zkey";
@@ -31,8 +29,19 @@ describe("Voting", function () {
     sessionId = 0;
   })
 
+  it("Check parammeters", async() => {
+    // check counter 
+    let counts = await voting.reportAll(sessionId);
+    for (let c of counts) {
+      expect(c).to.equal(0);
+    }
+    // check root 
+    expect(await voting.rootOf(sessionId)).to.equal(root);
+  })
+
   describe("Voting and count", () => {
     it("verify vote sucessfully", async function () {
+      const candidate = "0";
       const secretInput = OffChainManager.createMerkleProof(tickets[0], mTree);
 
       expect(secretInput.exist).equal(true);
@@ -41,10 +50,16 @@ describe("Voting", function () {
 
       let zkPoints = OffChainManager.solidityZKPoints(proof);
    
-      await voting.vote(sessionId, publicSignals[1], 0, ...zkPoints);
+      await voting.vote(sessionId, publicSignals[1], candidate, ...zkPoints).should.be.fulfilled;
 
-      console.log(await voting.reportAll('0'));
+      let result = await voting.reportAll(sessionId);
+
+      expect(result[0]).to.equal(1);
+      expect(result[1]).to.equal(0);
+      expect(await voting.isVoted(sessionId, publicSignals[1])).to.equal(true);
     });
+
+    
   })
 
 });
