@@ -7,25 +7,43 @@ const config = require('./config');
 
 app.get("/", async (req, res) => {
     res.send({
-        "info": "V-Relayer server!!!", 
-        "relayerAddress": config.wallet.address, 
+        "info": "V-Relayer server!!!",
+        "relayerAddress": config.wallet.address,
         "relayerBalance": (await config.wallet.getBalance()).toString(),
-        "relayerContract": process.env.CONTRACT_ADDR, 
+        "relayerContract": process.env.CONTRACT_ADDR,
     })
 })
 
-app.get("/relay/:sessionId", async(req, res) => {
+app.get("/session/:sessionId", async (req, res) => {
+    let sessionId = req.params['sessionId'];
 
+    try {
+        res.send({
+            voteCount: await config.contract.reportAll(sessionId)
+        })
+    } catch (err) {
+        res.send({ err: err.message })
+    }
 })
 
 app.post("/relay/:sessionId/", async (req, res) => {
-    let sessionId = req.params['sessionId'];
-    let { voteCode, candidate, proof } = req.body;
+    const { sessionId } = req.params;
+    const { voteCode, candidateCode, candidate, proof } = req.body;
     try {
-        let tx = await config.contract.vote(sessionId, voteCode, candidate, ...proof);
-        let receipt = await tx.wait();
+        const gasEstimate = await config.contract.estimateGas.vote(
+            sessionId, voteCode, candidateCode, candidate, ...proof
+        );
+
+        const tx = await config.contract.vote(
+            sessionId, voteCode, candidateCode, candidate, ...proof,
+            { gasLimit: gasEstimate }
+        );
+
+        const receipt = await tx.wait();
         res.send({
-            txHash: receipt.hash
+            blockHash: receipt.blockHash,
+            txHash: receipt.transactionHash,
+            gasUsed: receipt.gasUsed
         })
     } catch (err) {
         res.send({ err });

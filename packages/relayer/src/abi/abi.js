@@ -48,6 +48,30 @@ module.exports = [
         "internalType": "uint256",
         "name": "_sessionId",
         "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_voteCode",
+        "type": "uint256"
+      }
+    ],
+    "name": "isVoted",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_sessionId",
+        "type": "uint256"
       }
     ],
     "name": "reportAll",
@@ -56,6 +80,25 @@ module.exports = [
         "internalType": "uint256[]",
         "name": "numberVotes",
         "type": "uint256[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_sessionId",
+        "type": "uint256"
+      }
+    ],
+    "name": "rootOf",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
       }
     ],
     "stateMutability": "view",
@@ -116,9 +159,9 @@ module.exports = [
         "type": "uint256[2]"
       },
       {
-        "internalType": "uint256[2]",
+        "internalType": "uint256[4]",
         "name": "input",
-        "type": "uint256[2]"
+        "type": "uint256[4]"
       }
     ],
     "name": "verifyProof",
@@ -142,6 +185,11 @@ module.exports = [
       {
         "internalType": "uint256",
         "name": "_voteCode",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_candidateCode",
         "type": "uint256"
       },
       {
