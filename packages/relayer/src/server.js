@@ -18,8 +18,21 @@ app.get("/session/:sessionId", async (req, res) => {
     let sessionId = req.params['sessionId'];
 
     try {
+        let query = await config.contract.reportAll(sessionId);
+        
+        const candidates = query.candidates.split(";");
+        const voteResults = query.numberVotes.map(v => v.toString());
+        
+        let result = {
+        }
+    
+        candidates.forEach((candidate,index) => {
+            result[candidate] = voteResults[index]
+        });
+
         res.send({
-            voteCount: await config.contract.reportAll(sessionId)
+            "question": query.question,
+            result    
         })
     } catch (err) {
         res.send({ err: err.message })
@@ -40,10 +53,11 @@ app.post("/relay/:sessionId/", async (req, res) => {
         );
 
         const receipt = await tx.wait();
+
         res.send({
             blockHash: receipt.blockHash,
             txHash: receipt.transactionHash,
-            gasUsed: receipt.gasUsed
+            gasUsed: receipt.gasUsed.toString()
         })
     } catch (err) {
         res.send({ err });

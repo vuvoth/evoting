@@ -77,6 +77,16 @@ module.exports = [
     "name": "reportAll",
     "outputs": [
       {
+        "internalType": "string",
+        "name": "question",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "candidates",
+        "type": "string"
+      },
+      {
         "internalType": "uint256[]",
         "name": "numberVotes",
         "type": "uint256[]"
