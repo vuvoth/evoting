@@ -9,7 +9,7 @@
 import VoteForm from "@/components/VoteForm.vue";
 
 export default {
-  name: "Home",
+  name: "Vote",
   components: {
     VoteForm,
   },

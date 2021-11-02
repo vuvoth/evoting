@@ -1,7 +1,7 @@
 <template>
-  <div id="nav" class="text-center p-10">
-    <router-link to="/">Home</router-link> |
-    <router-link to="/about">About</router-link>
+  <div id="nav" class="text-center p-3">
+    <router-link to="/vote">Vote</router-link> |
+    <router-link to="/create">Create Vote Session</router-link>
   </div>
   <router-view />
 </template>

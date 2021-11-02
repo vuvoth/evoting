@@ -1,4 +1,6 @@
 require('dotenv').config();
+
+const { writeFile, readFile } = require('fs');
 const express = require('express')
 const app = express()
 app.use(express.json());
@@ -19,6 +21,29 @@ app.get("/", async (req, res) => {
     })
 })
 
+// store merkle tree
+app.post("/zkproof/:sessionId", async (req, res) => {
+    const { mTree } = req.body;
+    const { sessionId } = req.params;
+    writeFile(__dirname + `/data/${process.env.CONTRACT_ADDR}/${sessionId}`, JSON.stringify(mTree), (err) => {
+        if (!err) {
+            res.send({ success: true });
+        } else {
+            res.send({ error: err });
+        }
+    });
+})
+
+// fetch merket tree
+app.get("/zkproof/:sessionId", async (req, res) => {
+    readFile(__dirname + `/data/${process.env.CONTRACT_ADDR}/${sessionId}`, (err, data) => {
+        if (!err) {
+            res.send(JSON.parse(data));
+        } else {
+            res.send({error: err})
+        }
+    })
+})
 
 app.get("/session/:sessionId", async (req, res) => {
     let sessionId = req.params['sessionId'];
@@ -30,9 +55,9 @@ app.get("/session/:sessionId", async (req, res) => {
         const voteResults = query.numberVotes.map(v => v.toString());
 
         let result = []
-    
+
         voteResults.forEach((vote, index) => {
-            result.push({candidate: candidates[index], vote});
+            result.push({ candidate: candidates[index], vote });
         });
 
         res.send({

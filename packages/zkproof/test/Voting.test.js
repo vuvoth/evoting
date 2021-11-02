@@ -62,8 +62,6 @@ describe("Voting", function () {
       expect(result.numberVotes[1]).to.equal(0);
       expect(await voting.isVoted(sessionId, publicSignals[1])).to.equal(true);
     });
-
-
   })
 
 });
