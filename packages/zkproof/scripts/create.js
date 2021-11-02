@@ -4,7 +4,7 @@
 // When running the script with `npx hardhat run <script>` you'll find the Hardhat
 // Runtime Environment's members available in the global scope.
 const hre = require("hardhat");
-
+const OffChainManager = require("../src/OffChainManager");
 async function main() {
   // Hardhat always runs the compile task when running scripts with its command
   // line interface.
@@ -14,10 +14,23 @@ async function main() {
   // await hre.run('compile');
 
   // We get the contract to deploy
-  const Voting = await hre.ethers.getContractFactory("Voting");
-  const voting = Voting.attach("0x5FbDB2315678afecb367f032d93F642f64180aa3");
-  
+  await hre.deployments.fixture(['Voting']);
 
+  const deployInfo = await hre.deployments.get("Voting");
+
+  const Voting = await hre.ethers.getContractFactory("Voting");
+  const voting = Voting.attach(deployInfo.address);
+
+  console.log(deployInfo.address)
+  let sessionOffChain = OffChainManager.createVoteSession(4);
+  mTree = sessionOffChain.mTree;
+  tickets = sessionOffChain.tickets;
+  root = sessionOffChain.root;
+
+  let tx = await voting.createVoteSession(root);
+  await tx.wait();
+
+  console.log("finished......");
 }
 
 // We recommend this pattern to be able to use async/await everywhere

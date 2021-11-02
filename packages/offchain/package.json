@@ -1,0 +1,10 @@
+{
+  "name": "@evoting/offchain",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "dependencies": {
+    "circomlibjs": "^0.1.0",
+    "web3-utils": "^1.6.0"
+  }
+}

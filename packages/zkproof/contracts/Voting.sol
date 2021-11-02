@@ -66,17 +66,22 @@ contract Voting is Verifier {
         return sessions[_sessionId].voteCodes[_voteCode];
     }
 
+
     function reportAll(uint256 _sessionId)
         public
         view
-        returns (uint256[] memory numberVotes)
+        returns (string memory question, string memory candidates, uint256[] memory numberVotes)
     {
         require(sessions[_sessionId].root != 0, "Vote market not exist");
         uint256 candidateNumber = sessions[_sessionId].candidates.length;
-        numberVotes = new uint256[](candidateNumber);
 
+        question = sessions[_sessionId].question;
+        numberVotes = new uint256[](candidateNumber);
+        candidates = "";
+        
         for (uint256 i = 0; i < candidateNumber; ++i) {
             numberVotes[i] = sessions[_sessionId].voteCounters[i];
+            candidates = string(abi.encodePacked(candidates, sessions[_sessionId].candidates[i], ";"));
         }
     }
 }

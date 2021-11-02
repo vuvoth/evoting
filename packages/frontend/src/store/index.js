@@ -8,8 +8,8 @@ export default createStore({
     signer: Object,
     provider: Object,
     isConnected: false,
-    currentAccount: String,
-    balance: String,
+    currentAccount: "",
+    balance: "0",
   },
 
   mutations: {

@@ -1,6 +1,6 @@
 <template>
   <div class="home text-center">
-    <vote-form msg="Welcome to Your Vue.js App" />
+    <vote-form />
   </div>
 </template>
 

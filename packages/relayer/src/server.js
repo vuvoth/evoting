@@ -5,6 +5,11 @@ app.use(express.json());
 
 const config = require('./config');
 
+app.use((req, res, next) => {
+    res.header("Access-Control-Allow-Origin", "*");
+    next();
+})
+
 app.get("/", async (req, res) => {
     res.send({
         "info": "V-Relayer server!!!",
@@ -14,25 +19,25 @@ app.get("/", async (req, res) => {
     })
 })
 
+
 app.get("/session/:sessionId", async (req, res) => {
     let sessionId = req.params['sessionId'];
 
     try {
         let query = await config.contract.reportAll(sessionId);
-        
+
         const candidates = query.candidates.split(";");
         const voteResults = query.numberVotes.map(v => v.toString());
-        
-        let result = {
-        }
+
+        let result = []
     
-        candidates.forEach((candidate,index) => {
-            result[candidate] = voteResults[index]
+        voteResults.forEach((vote, index) => {
+            result.push({candidate: candidates[index], vote});
         });
 
         res.send({
             "question": query.question,
-            result    
+            result
         })
     } catch (err) {
         res.send({ err: err.message })

@@ -1,25 +1,129 @@
 <template>
-  <div class="hello">
-    <h1>{{ msg }}</h1>
+  <div class="vote-form p-3" v-cloak>
+    <h1 class="p-3">
+      This is my dApp! Click Connect Button to connect to Metamask
+    </h1>
     <connect-button />
-    <div v-if="isConnected">
+    <div v-if="getSignerAddress !== ''">
       <p>Connect Account: {{ getSignerAddress }}</p>
       <p>Balance : {{ balance }}</p>
+    </div>
+    <div id="form">
+      <form
+        @submit.prevent="fetchSessionData"
+        class="text-center content-center mb-3 p-3"
+      >
+        Your Vote session ID
+        <input
+          class="text-gray-700 text-sm font-bold mb-3 p-2"
+          type="text"
+          v-model="sessionId"
+        />
+
+        <input type="submit" value="Fetch information" />
+      </form>
+    </div>
+
+    <ul>
+      <p>Quesion : {{ sessionData.question }}</p>
+      <li v-for="(candidate, index) in sessionData.result" v-bind:key="index">
+        {{ candidate.candidate }} - {{ candidate.vote }}
+      </li>
+    </ul>
+
+    <div id="vote" v-if="sessionData.result.length > 0">
+      <form
+        @submit.prevent="voteAction"
+        class="text-center content-center mb-3 p-3"
+      >
+        Ticket
+        <input
+          class="
+            shadow
+            appearance-none
+            border
+            rounded
+            w-full
+            py-2
+            px-3
+            text-gray-700
+            leading-tight
+            focus:outline-none focus:shadow-outline
+          "
+          type="text"
+          v-model="ticket"
+        />
+        Candidate
+        <select
+          class="
+            block
+            appearance-none
+            content-center
+            bg-white
+            border border-gray-400
+            hover:border-gray-500
+            px-4
+            py-2
+            pr-8
+            rounded
+            shadow
+            leading-tight
+            focus:outline-none focus:shadow-outline
+            w-full
+          "
+          v-model="voteCandidate"
+        >
+          <option
+            v-for="(candidate, index) in sessionData.result"
+            v-bind:key="index"
+            class="text-center"
+          >
+            {{ candidate.candidate }}
+          </option>
+        </select>
+
+        <input
+          type="submit"
+          value="Vote"
+          class="bg-blue-500 hover:bg-blue-700 text-white p-3 m-3"
+        />
+      </form>
     </div>
   </div>
 </template>
 
 <script>
 import ConnectButton from "./ConnectButton.vue";
+import axios from "axios";
+
 export default {
   name: "VoteForm",
-  props: {
-    msg: String,
+  data: function () {
+    return {
+      sessionId: 0,
+      ticket: "",
+      voteCandidate: "",
+      sessionData: {
+        question: "",
+        result: [],
+      },
+    };
   },
   components: {
     ConnectButton,
   },
-  methods: {},
+  methods: {
+    fetchSessionData() {
+      axios
+        .get(`http://localhost:4040/session/${this.sessionId}`)
+        .then((result) => {
+          this.sessionData = result.data;
+          console.log(result.data);
+        });
+    },
+    voteAction() {
+    },
+  },
   computed: {
     getSignerAddress() {
       return this.$store.getters.getCurrentAccount;
@@ -29,6 +133,9 @@ export default {
     },
     balance() {
       return this.$store.state.balance;
+    },
+    candidates() {
+      return this.sessionData;
     },
   },
   mounted() {
@@ -40,3 +147,9 @@ export default {
   },
 };
 </script>
+
+<style>
+[v-cloak] {
+  display: none;
+}
+</style>

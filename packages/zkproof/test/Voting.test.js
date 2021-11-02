@@ -2,7 +2,7 @@ require("./setup");
 
 const { expect } = require("chai");
 const { ethers } = require("hardhat");
-const OffChainManager = require('../src/OffChainManager');
+const OffChainManager = require("@evoting/offchain");
 const snarkjs = require('snarkjs');
 
 describe("Voting", function () {
@@ -31,8 +31,8 @@ describe("Voting", function () {
 
   it("Check parammeters", async () => {
     // check counter 
-    let counts = await voting.reportAll(sessionId);
-    for (let c of counts) {
+    let report = await voting.reportAll(sessionId);
+    for (let c of report.numberVotes) {
       expect(c).to.equal(0);
     }
     // check root 
@@ -52,12 +52,14 @@ describe("Voting", function () {
 
       let zkPoints = OffChainManager.solidityZKPoints(proof);
 
-      await voting.vote(sessionId, publicSignals[1], publicSignals[2], candidate, ...zkPoints).should.be.fulfilled;
+      let tx = await voting.vote(sessionId, publicSignals[1], publicSignals[2], candidate, ...zkPoints).should.be.fulfilled;
+
+      await tx.wait();
 
       let result = await voting.reportAll(sessionId);
 
-      expect(result[0]).to.equal(1);
-      expect(result[1]).to.equal(0);
+      expect(result.numberVotes[0]).to.equal(1);
+      expect(result.numberVotes[1]).to.equal(0);
       expect(await voting.isVoted(sessionId, publicSignals[1])).to.equal(true);
     });
 

@@ -1,5 +1,5 @@
 {
-  "name": "evoting",
+  "name": "@evoting/zkproof",
   "version": "1.0.0",
   "private": true,
   "author": {
@@ -19,7 +19,9 @@
     "circomlib": "0.5.5",
     "circomlibjs": "^0.0.8",
     "core-js": "^3.6.5",
-    "snarkjs": "0.4.10"
+    "hardhat-deploy": "^0.9.4",
+    "snarkjs": "0.4.10",
+    "@evoting/offchain": "^1.0.0"
   },
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.2",

@@ -2,9 +2,6 @@ const merkleTree = require('./merkleTree');
 const Web3Utils = require("web3-utils");
 const BN = Web3Utils.BN;
 const { mimcsponge } = require('circomlibjs')
-const { ethers } = require("ethers");
-
-const ethBN = ethers.BigNumber.from;
 
 function createVoteSession(numberVoter, seed = "this is the seed") {
     // init tickets
@@ -65,7 +62,7 @@ function createMerkleProof(ticket, mTree) {
 function p256(n) {
     let nstr = n.toString(16);
     while (nstr.length < 64) nstr = "0"+nstr;
-    nstr = ethBN(`${nstr}`);
+    nstr = `${nstr}`;
     return nstr;
 }
 
