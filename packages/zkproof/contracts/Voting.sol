@@ -4,6 +4,7 @@ pragma solidity 0.6.11;
 import "./Verifier.sol";
 
 contract Voting is Verifier {
+    event CreatedSession(address sender, uint256 sessionID);
     event Vote(uint256 sessionId, uint256 voteCode, uint256 candidateId);
 
     struct VSession {
@@ -24,6 +25,8 @@ contract Voting is Verifier {
         sessions[sessionNumber].root = _root;
         sessions[sessionNumber].candidates.push("Liv");
         sessions[sessionNumber].candidates.push("MU");
+
+        emit CreatedSession(msg.sender, sessionNumber);
         sessionNumber = sessionNumber + 1;
     }
 

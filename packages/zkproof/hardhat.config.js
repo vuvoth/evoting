@@ -1,3 +1,4 @@
+require("dotenv").config();
 require("@nomiclabs/hardhat-waffle");
 require("@nomiclabs/hardhat-ethers");
 require("hardhat-deploy")
@@ -27,6 +28,10 @@ module.exports = {
     hardhat: {
       chainId: 1337,
     },
+    rinkeby: {
+      url: "https://rinkeby.infura.io/v3/" + process.env.INFURA_API_KEY,
+      accounts: [process.env.PRIVATE_KEY]
+    }
   },
   namedAccounts: {
     deployer: {

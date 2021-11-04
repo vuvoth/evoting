@@ -39,7 +39,7 @@ app.post("/zkproof/:sessionId", async (req, res) => {
 // fetch merket tree
 app.get("/zkproof/:sessionId", async (req, res) => {
     const { sessionId } = req.params;
-    readFile(__dirname + `/data/${process.env.CONTRACT_ADDR}_${sessionId}`, (err, data) => {
+    readFile(__dirname + `/data/${process.env.CONTRACT_ADDR}_${sessionId}.json`, (err, data) => {
         if (!err) {
             res.send(JSON.parse(data));
         } else {
@@ -99,4 +99,11 @@ app.post("/relay/:sessionId/", async (req, res) => {
 })
 
 
+app.get("/zkey", (req,res) => {
+    res.sendFile(__dirname + "/zkmeta/merkle_final.zkey");
+})
+
+app.get("/wasm", (req,res) => {
+    res.sendFile(__dirname + "/zkmeta/merkleTree.wasm");
+})
 module.exports = app;

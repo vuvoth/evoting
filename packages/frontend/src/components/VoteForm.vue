@@ -1,9 +1,5 @@
 <template>
   <div class="vote-form p-3" v-cloak>
-    <h1 class="p-3">
-      This is my dApp! Click Connect Button to connect to Metamask
-    </h1>
-    <connect-button />
     <div v-if="getSignerAddress !== ''">
       <p>Connect Account: {{ getSignerAddress }}</p>
       <p>Balance : {{ balance }}</p>
@@ -93,8 +89,8 @@
 </template>
 
 <script>
-import ConnectButton from "./ConnectButton.vue";
 import axios from "axios";
+import offchain from "@evoting/offchain";
 
 export default {
   name: "VoteForm",
@@ -109,19 +105,40 @@ export default {
       },
     };
   },
-  components: {
-    ConnectButton,
-  },
+  components: {},
   methods: {
     fetchSessionData() {
       axios
         .get(`http://localhost:4040/session/${this.sessionId}`)
         .then((result) => {
           this.sessionData = result.data;
-          console.log(result.data);
+        })
+        .catch((err) => {
+          console.log("This is error", err);
         });
     },
     voteAction() {
+      console.log(offchain);
+      axios
+        .get(`http://localhost:4040/zkproof/${this.sessionId}`)
+        .then(async (result) => {
+          const data = result.data;
+          const secretInput = offchain.createMerkleProof(
+            this.ticket,
+            offchain.toBNs(data.mTree)
+          );
+
+          const witness = await offchain.proof(secretInput, "0");
+          const contract = this.$store.state.contract;
+
+          let tx = await contract.vote(this.sessionId, ...witness);
+
+          let r = await tx.wait();
+          console.log(r);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
     },
   },
   computed: {

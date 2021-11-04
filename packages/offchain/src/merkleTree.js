@@ -1,4 +1,4 @@
-const { mimcsponge } = require('circomlibjs')
+const { mimcsponge } = require('circomlib')
 
 const Scalar = require("ffjavascript").Scalar
 const Web3Utils = require("web3-utils");

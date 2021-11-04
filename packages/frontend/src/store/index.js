@@ -1,12 +1,32 @@
 import { createStore } from "vuex";
+// import dotenv from "dotenv";
 
 import { ethers } from "ethers";
+
+const ABI = [
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "_root",
+        type: "uint256",
+      },
+    ],
+    name: "createVoteSession",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+];
+
+const CONTRACT = "0x3226a5B9371DdcC1aD1c75018776F6B985E95014";
 
 export default createStore({
   state: {
     voteSessions: [],
     signer: Object,
     provider: Object,
+    contract: Object,
     isConnected: false,
     currentAccount: "",
     balance: "0",
@@ -20,6 +40,16 @@ export default createStore({
           "any"
         );
         state.provider = provider;
+        state.signer = provider.getSigner();
+        try {
+          state.contract = new ethers.Contract(
+            CONTRACT,
+            ABI,
+            provider.getSigner()
+          );
+        } catch (err) {
+          console.log(err);
+        }
         state.isConnected = true;
       }
     },
@@ -56,8 +86,6 @@ export default createStore({
               context.commit("SET_BALANCE", balance);
             });
         });
-
-      console.log("Change");
     },
 
     disconnectFromMetaMask(context) {

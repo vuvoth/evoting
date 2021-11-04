@@ -19,7 +19,7 @@ describe("Voting", function () {
     // wait until the transaction is mined
     await voting.deployed();
 
-    let sessionOffChain = OffChainManager.createVoteSession(4);
+    let sessionOffChain = OffChainManager.createVoteSession(4, "seed");
     mTree = sessionOffChain.mTree;
     tickets = sessionOffChain.tickets;
     root = sessionOffChain.root;

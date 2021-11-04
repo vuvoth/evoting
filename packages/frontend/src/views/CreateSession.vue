@@ -1,17 +1,17 @@
 <template>
   <div class="home text-center">
-    <vote-form />
+    <create-vote-session />
   </div>
 </template>
 
 <script>
 // @ is an alias to /src
-import VoteForm from "@/components/VoteForm.vue";
+import CreateVoteSession from "@/components/Create.vue";
 
 export default {
   name: "CreateSession",
   components: {
-    VoteForm,
+    CreateVoteSession,
   },
 };
 </script>
