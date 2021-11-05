@@ -2,6 +2,7 @@ const merkleTree = require('./merkleTree');
 const Web3Utils = require("web3-utils");
 const BN = Web3Utils.BN;
 const { mimcsponge } = require('circomlibjs')
+// const snarkjs = require("snarkjs");
 
 function createVoteSession(numberVoter, seed = "this is the seed") {
     // init tickets
@@ -16,13 +17,13 @@ function createVoteSession(numberVoter, seed = "this is the seed") {
 
     return {
         root: mTree[0].toString(),
-        mTree, 
+        mTree,
         tickets
     };
 }
 
 function createMerkleProof(ticket, mTree) {
-    const equalHash = (h) => h.toString() == mimcsponge.multiHash(ticket).toString();
+    const equalHash = (h) => h.toString() === mimcsponge.multiHash([ticket]).toString();
     let blockId = mTree.findIndex(h => equalHash(h));
 
     let order = [];
@@ -30,10 +31,12 @@ function createMerkleProof(ticket, mTree) {
 
     if (blockId == -1) {
         return {
-            exist: false, 
-            ticket, 
-            order,
-            merkleProof
+            exist: false,
+            data: {
+                ticket,
+                order,
+                merkleProof
+            }
         }
     }
     const isRoot = (r) => r == 0;
@@ -51,13 +54,47 @@ function createMerkleProof(ticket, mTree) {
 
     return {
         exist: true,
-        ticket,
-        order,
-        merkleProof
+        data: {
+            ticket,
+            order,
+            merkleProof
+        }
     }
+}
+
+function p256(n) {
+    let nstr = n.toString(16);
+    while (nstr.length < 64) nstr = "0" + nstr;
+    nstr = `${nstr}`;
+    return nstr;
+}
+
+function solidityZKPoints(proof) {
+    let solidityParams = [
+        [p256(proof.pi_a[0]), p256(proof.pi_a[1])],
+        [
+            [p256(proof.pi_b[0][1]), p256(proof.pi_b[0][0])],
+            [p256(proof.pi_b[1][1]), p256(proof.pi_b[1][0])]
+        ],
+        [p256(proof.pi_c[0]), p256(proof.pi_c[1])]
+    ]
+    return solidityParams;
+}
+
+function toBNs(arr = []) {
+    return arr.map(v => new BN(v));
+}
+
+function formatProof(candidate, proof, publicSignals) {
+    let zkPoints = solidityZKPoints(proof);
+
+    return [publicSignals[1], publicSignals[2], candidate, ...zkPoints]
 }
 
 module.exports = {
     createVoteSession,
-    createMerkleProof
+    createMerkleProof,
+    solidityZKPoints,
+    toBNs,
+    formatProof
 }

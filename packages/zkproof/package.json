@@ -1,5 +1,5 @@
 {
-  "name": "evoting",
+  "name": "@evoting/zkproof",
   "version": "1.0.0",
   "private": true,
   "author": {
@@ -8,26 +8,28 @@
   },
   "scripts": {
     "cirCompile": "cd ./circom/ && circom src/merkleTree.circom --r1cs --wasm --sym",
-    "potSetup": "snarkjs powersoftau new bn128 15 ./circom/pot15_0000.ptau -v && snarkjs powersoftau prepare phase2 ./circom/pot15_0000.ptau ./circom/pot15_final.ptau -v",
+    "potSetup": "snarkjs powersoftau new bn128 15 ./circom/pot15_0000.ptau -v && snarkjs powersoftau contribute ./circom/pot15_0000.ptau ./circom/pot15_0001.ptau --name='First contribution' -v && snarkjs powersoftau prepare phase2 ./circom/pot15_0001.ptau ./circom/pot15_final.ptau -v",
     "zkSetup": "snarkjs groth16 setup ./circom/merkleTree.r1cs ./circom/pot15_final.ptau ./circom/merkle_final.zkey",
-    "zkProof": "snarkjs groth16 prove ./circom/merkle_final.zkey ./circom/merkleTree_js/witness.wtns ./circom/proof.json ./circom/public.json",
     "exportVerifyKey": "snarkjs zkey export verificationkey ./circom/merkle_final.zkey ./circom/verification_key.json",
     "exportSolidity": "snarkjs zkey export solidityverifier ./circom/merkle_final.zkey ./contracts/Verifier.sol"
   },
   "main": "index.js",
   "dependencies": {
+    "@evoting/offchain": "^1.0.0",
     "circom": "^0.5.46",
-    "circomlib": "0.5.0",
+    "circomlib": "0.5.5",
     "circomlibjs": "^0.0.8",
     "core-js": "^3.6.5",
-    "snarkjs": "0.4.10"
+    "dotenv": "^10.0.0",
+    "hardhat-deploy": "^0.9.4"
   },
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.2",
     "@nomiclabs/hardhat-waffle": "^2.0.1",
     "chai": "^4.3.4",
+    "chai-as-promised": "^7.1.1",
     "ethereum-waffle": "^3.4.0",
-    "ethers": "^5.5.1",
+    "ethers": "^5.0.0",
     "hardhat": "^2.6.6"
   },
   "license": "MIT"

@@ -8,5 +8,9 @@ build
 
 deployments
 
-./circom/pot15_0000.ptau
-./circom/pot15_final.ptau
+circom/*.ptau
+circom/*.r1cs
+circom/*.sym
+circom/*.zkey
+circom/*.wasm
+circom/*.json

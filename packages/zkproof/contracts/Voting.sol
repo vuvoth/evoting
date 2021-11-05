@@ -1,8 +1,10 @@
+// SPDX-License-Identifier: MIT
 pragma solidity 0.6.11;
 
 import "./Verifier.sol";
 
 contract Voting is Verifier {
+    event CreatedSession(address sender, uint256 sessionID);
     event Vote(uint256 sessionId, uint256 voteCode, uint256 candidateId);
 
     struct VSession {
@@ -23,12 +25,15 @@ contract Voting is Verifier {
         sessions[sessionNumber].root = _root;
         sessions[sessionNumber].candidates.push("Liv");
         sessions[sessionNumber].candidates.push("MU");
+
+        emit CreatedSession(msg.sender, sessionNumber);
         sessionNumber = sessionNumber + 1;
     }
 
     function vote(
         uint256 _sessionId,
         uint256 _voteCode,
+        uint256 _candidateCode,
         uint256 _candidateId,
         uint256[2] memory a,
         uint256[2][2] memory b,
@@ -38,13 +43,15 @@ contract Voting is Verifier {
             _candidateId < sessions[_sessionId].candidates.length,
             "invalid-vote"
         );
+
         require(sessions[_sessionId].voteCodes[_voteCode] == false, "voted");
+
         require(
             Verifier.verifyProof(
                 a,
                 b,
                 c,
-                [sessions[_sessionId].root, _voteCode]
+                [sessions[_sessionId].root, _voteCode, _candidateCode, _candidateId]
             ),
             "not-allowed-for-vote"
         );
@@ -54,16 +61,30 @@ contract Voting is Verifier {
         emit Vote(_sessionId, _voteCode, _candidateId);
     }
 
+    function rootOf(uint256 _sessionId) public view returns(uint256) {
+        return sessions[_sessionId].root;
+    }
+
+    function isVoted(uint256 _sessionId, uint256 _voteCode) public view returns(bool) {
+        return sessions[_sessionId].voteCodes[_voteCode];
+    }
+
+
     function reportAll(uint256 _sessionId)
         public
         view
-        returns (uint256[] memory numberVotes)
+        returns (string memory question, string memory candidates, uint256[] memory numberVotes)
     {
+        require(sessions[_sessionId].root != 0, "Vote market not exist");
         uint256 candidateNumber = sessions[_sessionId].candidates.length;
-        numberVotes = new uint256[](candidateNumber);
 
+        question = sessions[_sessionId].question;
+        numberVotes = new uint256[](candidateNumber);
+        candidates = "";
+        
         for (uint256 i = 0; i < candidateNumber; ++i) {
             numberVotes[i] = sessions[_sessionId].voteCounters[i];
+            candidates = string(abi.encodePacked(candidates, sessions[_sessionId].candidates[i], ";"));
         }
     }
 }
