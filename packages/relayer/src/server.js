@@ -1,17 +1,21 @@
 require('dotenv').config();
 
 const { writeFile, readFile } = require('fs');
-const express = require('express')
-const app = express()
-app.use(express.json());
-
 const config = require('./config');
 
-app.use((req, res, next) => {
-    res.header("Access-Control-Allow-Headers", "*");
-    res.header("access-control-allow-origin", "*");
-    next();
-})
+const cors = require('cors')
+const express = require('express')
+const app = express();
+
+app.use(cors());
+app.use(express.json());
+app.use(express.static(__dirname + "/zkmeta"))
+
+// app.use((req, res, next) => {
+//     res.header("Access-Control-Allow-Headers", "*");
+//     res.header("access-control-allow-origin", "*");
+//     next();
+// })
 
 app.get("/", async (req, res) => {
     res.send({
@@ -77,6 +81,7 @@ app.post("/relay/:sessionId/", async (req, res) => {
     const { sessionId } = req.params;
     const { voteCode, candidateCode, candidate, proof } = req.body;
     try {
+
         const gasEstimate = await config.contract.estimateGas.vote(
             sessionId, voteCode, candidateCode, candidate, ...proof
         );
@@ -86,24 +91,20 @@ app.post("/relay/:sessionId/", async (req, res) => {
             { gasLimit: gasEstimate }
         );
 
-        const receipt = await tx.wait();
+        console.log("Pending transaction hash ", tx.hash);
 
+        const receipt = await tx.wait();
+        console.log("Finished");
         res.send({
             blockHash: receipt.blockHash,
             txHash: receipt.transactionHash,
             gasUsed: receipt.gasUsed.toString()
         })
     } catch (err) {
+        res.status(400);
+        console.log(err);
         res.send({ err });
     }
 })
 
-
-app.get("/zkey", (req,res) => {
-    res.sendFile(__dirname + "/zkmeta/merkle_final.zkey");
-})
-
-app.get("/wasm", (req,res) => {
-    res.sendFile(__dirname + "/zkmeta/merkleTree.wasm");
-})
 module.exports = app;

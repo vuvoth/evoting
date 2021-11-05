@@ -91,6 +91,7 @@
 <script>
 import axios from "axios";
 import offchain from "@evoting/offchain";
+import * as snarkjs from "snarkjs/build/main.cjs";
 
 export default {
   name: "VoteForm",
@@ -117,8 +118,10 @@ export default {
           console.log("This is error", err);
         });
     },
-    voteAction() {
-      console.log(offchain);
+    async voteAction() {
+      const candidateId = this.sessionData.result.findIndex(
+        (data) => data.candidate === this.voteCandidate
+      );
       axios
         .get(`http://localhost:4040/zkproof/${this.sessionId}`)
         .then(async (result) => {
@@ -127,14 +130,33 @@ export default {
             this.ticket,
             offchain.toBNs(data.mTree)
           );
+          secretInput.data["candidate"] = candidateId.toString();
+          const { proof, publicSignals } = await snarkjs.groth16.fullProve(
+            secretInput.data,
+            "http://localhost:4040/merkleTree.wasm",
+            "http://localhost:4040/merkle_final.zkey"
+          );
 
-          const witness = await offchain.proof(secretInput, "0");
-          const contract = this.$store.state.contract;
+          const relayData = {
+            voteCode: publicSignals[1],
+            candidateCode: publicSignals[2],
+            candidate: candidateId.toString(),
+            proof: offchain.solidityZKPoints(proof),
+          };
 
-          let tx = await contract.vote(this.sessionId, ...witness);
-
-          let r = await tx.wait();
-          console.log(r);
+          axios
+            .post("http://localhost:4040/relay/" + this.sessionId, relayData)
+            .then((res) => {
+              console.log(res);
+              axios
+                .get(`http://localhost:4040/session/${this.sessionId}`)
+                .then((result) => {
+                  this.sessionData = result.data;
+                })
+                .catch((err) => {
+                  console.log("This is error", err);
+                });
+            });
         })
         .catch((err) => {
           console.log(err);

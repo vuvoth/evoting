@@ -2,7 +2,7 @@ const merkleTree = require('./merkleTree');
 const Web3Utils = require("web3-utils");
 const BN = Web3Utils.BN;
 const { mimcsponge } = require('circomlibjs')
-import {groth16} from "snarkjs";
+// const snarkjs = require("snarkjs");
 
 function createVoteSession(numberVoter, seed = "this is the seed") {
     // init tickets
@@ -23,11 +23,6 @@ function createVoteSession(numberVoter, seed = "this is the seed") {
 }
 
 function createMerkleProof(ticket, mTree) {
-    console.log(mimcsponge.multiHash([ticket]).toString());
-    mTree.forEach(element => {
-        console.log(element.toString());
-    });
-
     const equalHash = (h) => h.toString() === mimcsponge.multiHash([ticket]).toString();
     let blockId = mTree.findIndex(h => equalHash(h));
 
@@ -37,9 +32,11 @@ function createMerkleProof(ticket, mTree) {
     if (blockId == -1) {
         return {
             exist: false,
-            ticket,
-            order,
-            merkleProof
+            data: {
+                ticket,
+                order,
+                merkleProof
+            }
         }
     }
     const isRoot = (r) => r == 0;
@@ -88,12 +85,8 @@ function toBNs(arr = []) {
     return arr.map(v => new BN(v));
 }
 
-async function proof(secretInput, candidate) {
-    secretInput.data["candidate"] = candidate;
-
-    let { proof, publicSignals } = await groth16.fullProve(secretInput.data, "http://localhost:4040/wasm", "http://localhost:4040/zkey");
-
-    let zkPoints = OffChainManager.solidityZKPoints(proof);
+function formatProof(candidate, proof, publicSignals) {
+    let zkPoints = solidityZKPoints(proof);
 
     return [publicSignals[1], publicSignals[2], candidate, ...zkPoints]
 }
@@ -103,5 +96,5 @@ module.exports = {
     createMerkleProof,
     solidityZKPoints,
     toBNs,
-    proof
+    formatProof
 }
