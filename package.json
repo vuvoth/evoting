@@ -3,6 +3,10 @@
   "version": "1.0.0",
   "main": "index.js",
   "workspaces": ["packages/*"],
+  "scripts": {
+    "relayer": "yarn --silent workspace @evoting/relayer",
+    "frontend": "yarn --silent workspace @evoting/frontend"
+  },
   "license": "MIT", 
   "private": true
 }

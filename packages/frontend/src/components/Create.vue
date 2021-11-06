@@ -89,6 +89,7 @@ export default {
           );
           this.sessionId = decodeData[1].toString();
           services.postMerkleTree(this.sessionId, mTree).then((result) => {
+            console.log(result);
             this.saveMetadata(tickets, mTree, this.sessionId);
             this.status = 2;
           });
