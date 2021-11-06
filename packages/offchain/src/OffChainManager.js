@@ -17,7 +17,7 @@ function createVoteSession(numberVoter, seed = "this is the seed") {
 
     return {
         root: mTree[0].toString(),
-        mTree,
+        mTree: mTree.map(v => v.toString()),
         tickets
     };
 }
