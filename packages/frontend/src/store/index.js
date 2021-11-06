@@ -19,7 +19,7 @@ const ABI = [
   },
 ];
 
-const CONTRACT = "0x3226a5B9371DdcC1aD1c75018776F6B985E95014";
+const CONTRACT = process.env.VUE_APP_CONTRACT;
 
 export default createStore({
   state: {

@@ -30,6 +30,7 @@
 import offchain from "@evoting/offchain";
 import axios from "axios";
 import { ethers } from "ethers";
+import services from "../services/Service";
 
 export default {
   name: "CreateVoteSession",
@@ -51,29 +52,16 @@ export default {
       contract
         .createVoteSession(root)
         .then(async (tx) => {
-          console.log(tx);
           let recepit = await tx.wait();
           const data = recepit.events[0].data;
           const decodeData = ethers.utils.defaultAbiCoder.decode(
             ["address", "uint256"],
             data
           );
-          axios
-            .post(
-              `http://localhost:4040/zkproof/${decodeData[1].toString()}`,
-              {
-                mTree: mTree.map((node) => node.toString()),
-              },
-              {
-                headers: {
-                  "Access-Control-Allow-Origin": "*",
-                  "Access-Control-Allow-Headers": "*",
-                },
-              }
-            )
-            .then((result) => {
-              console.log(result);
-            });
+          services.postMerkleTree(
+            decodeData[1].toString(),
+            mTree.map((node) => node.toString())
+          );
         })
         .catch((err) => {
           console.log(err);

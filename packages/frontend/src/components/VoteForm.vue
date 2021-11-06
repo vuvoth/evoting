@@ -89,9 +89,9 @@
 </template>
 
 <script>
-import axios from "axios";
 import offchain from "@evoting/offchain";
-import * as snarkjs from "snarkjs/build/main.cjs";
+import services from "../services/Service";
+import zkProof from "../logic/zkProof.js";
 
 export default {
   name: "VoteForm",
@@ -109,8 +109,8 @@ export default {
   components: {},
   methods: {
     fetchSessionData() {
-      axios
-        .get(`http://localhost:4040/session/${this.sessionId}`)
+      services
+        .getSession(this.sessionId)
         .then((result) => {
           this.sessionData = result.data;
         })
@@ -122,47 +122,29 @@ export default {
       const candidateId = this.sessionData.result.findIndex(
         (data) => data.candidate === this.voteCandidate
       );
-      axios
-        .get(`http://localhost:4040/zkproof/${this.sessionId}`)
-        .then(async (result) => {
-          const data = result.data;
-          const secretInput = offchain.createMerkleProof(
-            this.ticket,
-            offchain.toBNs(data.mTree)
-          );
-          secretInput.data["candidate"] = candidateId.toString();
-          const { proof, publicSignals } = await snarkjs.groth16.fullProve(
-            secretInput.data,
-            "http://localhost:4040/merkleTree.wasm",
-            "http://localhost:4040/merkle_final.zkey"
-          );
 
-          const relayData = {
-            voteCode: publicSignals[1],
-            candidateCode: publicSignals[2],
-            candidate: candidateId.toString(),
-            proof: offchain.solidityZKPoints(proof),
-          };
+      services.getMerkleTree(this.sessionId).then(async (result) => {
+        const data = result.data;
+        const { proof, publicSignals } = await zkProof(
+          this.ticket,
+          candidateId,
+          data.mTree
+        );
 
-          axios
-            .post("http://localhost:4040/relay/" + this.sessionId, relayData)
-            .then((res) => {
-              console.log(res);
-              axios
-                .get(`http://localhost:4040/session/${this.sessionId}`)
-                .then((result) => {
-                  this.sessionData = result.data;
-                })
-                .catch((err) => {
-                  console.log("This is error", err);
-                });
-            });
-        })
-        .catch((err) => {
-          console.log(err);
+        const relayData = {
+          voteCode: publicSignals[1],
+          candidateCode: publicSignals[2],
+          candidate: candidateId.toString(),
+          proof: offchain.solidityZKPoints(proof),
+        };
+
+        services.relayVote(this.sessionId, relayData).then((res) => {
+          this.fetchSessionData(this.sessionId);
         });
+      });
     },
   },
+
   computed: {
     getSignerAddress() {
       return this.$store.getters.getCurrentAccount;
