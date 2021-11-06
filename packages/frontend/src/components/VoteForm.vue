@@ -1,25 +1,44 @@
 <template>
-  <div class="vote-form p-3" v-cloak>
-    <div v-if="getSignerAddress !== ''">
-      <p>Connect Account: {{ getSignerAddress }}</p>
-      <p>Balance : {{ balance }}</p>
-    </div>
-    <div id="form">
-      <form
-        @submit.prevent="fetchSessionData"
-        class="text-center content-center mb-3 p-3"
-      >
-        Your Vote session ID
-        <input
-          class="text-gray-700 text-sm font-bold mb-3 p-2"
-          type="text"
-          v-model="sessionId"
-        />
-
-        <input type="submit" value="Fetch information" />
+  <div class="vote-form m-10" v-cloak>
+    <div class="text-center content-center m-10 p-10">
+      <form class="text-center w-full">
+        <div class="flex items-center border-b border-teal-500 py-2">
+          <input
+            class="
+              appearance-none
+              bg-transparent
+              border-none
+              w-full
+              text-gray-700
+              mr-3
+              py-1
+              px-2
+              leading-tight
+              focus:outline-none
+            "
+            type="text"
+            v-model="sessionId"
+            placeholder="Type your session id here"
+          />
+          <button
+            class="
+              flex-shrink-0
+              bg-green-500
+              honver:bg-green-700
+              text-sm
+              border-1
+              py-1
+              px-2
+              rounded
+            "
+            type="button"
+            @click="fetchSessionData"
+          >
+            Fetch Session
+          </button>
+        </div>
       </form>
     </div>
-
     <ul>
       <p>Quesion : {{ sessionData.question }}</p>
       <li v-for="(candidate, index) in sessionData.result" v-bind:key="index">
@@ -81,9 +100,22 @@
         <input
           type="submit"
           value="Vote"
-          class="bg-blue-500 hover:bg-blue-700 text-white p-3 m-3"
+          class="bg-green-500 hover:bg-green-700 text-white p-4 m-3 w-1/6"
         />
       </form>
+    </div>
+
+    <div>
+      <!-- <p v-if="status == 1">Creating Vote Session....</p> -->
+      <p v-if="status == 2">
+        Finished vote for {{ voteCandidate }} at {{ hash }}
+      </p>
+    </div>
+
+    <div v-if="status == 1" class="flex justify-center items-center">
+      <div
+        class="animate-spin rounded-full h-32 w-32 border-b-2 border-gray-900"
+      ></div>
     </div>
   </div>
 </template>
@@ -91,7 +123,7 @@
 <script>
 import offchain from "@evoting/offchain";
 import services from "../services/Service";
-import zkProof from "../logic/zkProof.js";
+import zkProof from "../logics/zkProof.js";
 
 export default {
   name: "VoteForm",
@@ -104,6 +136,8 @@ export default {
         question: "",
         result: [],
       },
+      hash: "",
+      status: 0,
     };
   },
   components: {},
@@ -119,6 +153,7 @@ export default {
         });
     },
     async voteAction() {
+      this.status = 1;
       const candidateId = this.sessionData.result.findIndex(
         (data) => data.candidate === this.voteCandidate
       );
@@ -140,6 +175,8 @@ export default {
 
         services.relayVote(this.sessionId, relayData).then((res) => {
           this.fetchSessionData(this.sessionId);
+          this.hash = res.data.txHash;
+          this.status = 2;
         });
       });
     },
